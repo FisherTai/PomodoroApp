@@ -19,6 +19,7 @@ import com.example.pomodoroapp.ui.theme.PomodoroAppTheme
 import com.example.pomodoroapp.ui.components.BottomBar
 import com.example.pomodoroapp.ui.components.TopBar
 import com.example.pomodoroapp.ui.home.HomeScreen
+import com.example.pomodoroapp.ui.home.HomeViewModel
 
 const val HOME = "Home"
 const val TASKS = "Tasks"
@@ -51,7 +52,7 @@ fun MainScreen(modifier: Modifier) {
                 .padding(16.dp) //疊加上內容的padding
         ) {
             composable(HOME) {
-                HomeScreen()
+                HomeScreen(homeViewModel = HomeViewModel())
             }
             composable(TASKS) {}
             composable(HISTORY) {}

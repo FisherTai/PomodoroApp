@@ -1,6 +1,5 @@
 package com.example.pomodoroapp.ui.home
 
-import android.text.format.DateUtils
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,47 +17,37 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pomodoroapp.util.PauseAbleCountDownTimer
-import java.time.Duration
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toKotlinDuration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
-enum class CountDownState {
-    RUNNING,
-    PAUSE,
-    STOP
-}
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    // 用Duration替代timestamp表示
-    val defaultTimeDuration = 25.minutes
-    var countDownState by remember { mutableStateOf(CountDownState.STOP) }
-    val taskDescribe by remember { mutableStateOf("測試任務") }
-    //format Duration時間為mm:ss
-    var timeString by remember {
-        mutableStateOf(
-            DateUtils.formatElapsedTime(defaultTimeDuration.inWholeSeconds)
-        )
-    }
+fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = HomeViewModel()) {
+    val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
+    val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
+    val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
+
     //倒數計時器
-    val countDownTimer = remember(defaultTimeDuration) {
+    val countDownTimer = remember(homeViewModel.defaultTimeDuration) {
         PauseAbleCountDownTimer(
-            millisInFuture = defaultTimeDuration.inWholeMilliseconds,
+            millisInFuture = homeViewModel.defaultTimeDuration.inWholeMilliseconds,
             countDownInterval = 1000,
             onTick = { millis ->
-                val timeLeft = Duration.ofMillis(millis).toKotlinDuration().inWholeSeconds
-                timeString = DateUtils.formatElapsedTime(timeLeft)
+                homeViewModel.setTimeLeft(millis.toDuration(DurationUnit.MILLISECONDS))
             },
-            onFinish = {
-//                isRunning = false
-            }
+            onComplete = {
+
+            },
+            onCancel = {
+
+            },
         )
     }
 
@@ -81,7 +70,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = timeString,
+                text = timeDisplay,
                 style = MaterialTheme.typography.displayLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -102,11 +91,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             Button(
                 shape = MaterialTheme.shapes.medium,
                 onClick = {
-                countDownState = when (countDownState) {
-                    CountDownState.RUNNING -> CountDownState.PAUSE
-                    else -> CountDownState.RUNNING
+                    val state = when (countDownState) {
+                        CountDownState.RUNNING -> CountDownState.PAUSE
+                        else -> CountDownState.RUNNING
+                    }
+                    homeViewModel.setCountDownState(state)
                 }
-            }) {
+            ) {
                 Text(
                     text = if (countDownState == CountDownState.RUNNING) "Pause" else "Start",
                     style = MaterialTheme.typography.titleLarge
@@ -120,8 +111,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 shape = MaterialTheme.shapes.medium,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
                 onClick = {
-                    timeString = DateUtils.formatElapsedTime(defaultTimeDuration.inWholeSeconds)
-                    countDownState = CountDownState.STOP
+                    homeViewModel.resetTimer()
+                    homeViewModel.setCountDownState(CountDownState.STOP)
                 }) {
                 Text(
                     text = "Reset",

@@ -6,7 +6,8 @@ class PauseAbleCountDownTimer(
     private val millisInFuture: Long,
     private val countDownInterval: Long,
     private val onTick: (Long) -> Unit,
-    private val onFinish: () -> Unit
+    private val onCancel: () -> Unit,
+    private val onComplete: () -> Unit,
 ) {
     private var timer: CountDownTimer? = null
     private var timeLeft: Long = millisInFuture
@@ -21,7 +22,7 @@ class PauseAbleCountDownTimer(
 
             override fun onFinish() {
                 isRunning = false
-                this@PauseAbleCountDownTimer.onFinish()
+                this@PauseAbleCountDownTimer.onCancel()
             }
         }.start()
         isRunning = true
