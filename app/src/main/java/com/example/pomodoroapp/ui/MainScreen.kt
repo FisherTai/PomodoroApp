@@ -52,7 +52,7 @@ fun MainScreen(modifier: Modifier) {
                 .padding(16.dp) //疊加上內容的padding
         ) {
             composable(HOME) {
-                HomeScreen(homeViewModel = HomeViewModel())
+                HomeScreen()
             }
             composable(TASKS) {}
             composable(HISTORY) {}

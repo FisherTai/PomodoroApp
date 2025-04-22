@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = HomeViewModel()) {
+fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
     val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
     val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
