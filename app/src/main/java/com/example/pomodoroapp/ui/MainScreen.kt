@@ -1,5 +1,7 @@
 package com.example.pomodoroapp.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -19,7 +21,7 @@ import com.example.pomodoroapp.ui.theme.PomodoroAppTheme
 import com.example.pomodoroapp.ui.components.BottomBar
 import com.example.pomodoroapp.ui.components.TopBar
 import com.example.pomodoroapp.ui.home.HomeScreen
-import com.example.pomodoroapp.ui.home.HomeViewModel
+import com.example.pomodoroapp.ui.tasks.TaskListScreen
 
 const val HOME = "Home"
 const val TASKS = "Tasks"
@@ -47,6 +49,10 @@ fun MainScreen(modifier: Modifier) {
         NavHost(
             navController = navController,
             startDestination = HOME,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(16.dp) //疊加上內容的padding
@@ -54,7 +60,9 @@ fun MainScreen(modifier: Modifier) {
             composable(HOME) {
                 HomeScreen()
             }
-            composable(TASKS) {}
+            composable(TASKS) {
+                TaskListScreen()
+            }
             composable(HISTORY) {}
         }
     }
