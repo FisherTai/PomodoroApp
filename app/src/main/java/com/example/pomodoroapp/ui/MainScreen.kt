@@ -23,14 +23,14 @@ import com.example.pomodoroapp.ui.components.TopBar
 import com.example.pomodoroapp.ui.home.HomeScreen
 import com.example.pomodoroapp.ui.tasks.TaskListScreen
 
-const val HOME = "Home"
+const val TIMER = "Timer"
 const val TASKS = "Tasks"
 const val HISTORY = "History"
 
 @Composable
 fun MainScreen(modifier: Modifier) {
     val navController = rememberNavController()
-    var currentTitle by remember { mutableStateOf(HOME) }
+    var currentTitle by remember { mutableStateOf(TIMER) }
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect {
             currentTitle = when (it.destination.route) {
@@ -48,7 +48,7 @@ fun MainScreen(modifier: Modifier) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = HOME,
+            startDestination = TIMER,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
@@ -57,7 +57,7 @@ fun MainScreen(modifier: Modifier) {
                 .padding(paddingValues)
                 .padding(16.dp) //疊加上內容的padding
         ) {
-            composable(HOME) {
+            composable(TIMER) {
                 HomeScreen()
             }
             composable(TASKS) {
