@@ -33,18 +33,19 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 @Composable
-fun TaskListScreen(modifier: Modifier = Modifier) {
+fun TaskListScreen(
+    modifier: Modifier = Modifier,
+    taskListViewModel: TaskListViewModel = hiltViewModel()
+) {
 
+    val tasks by taskListViewModel.tasks.collectAsStateWithLifecycle()
+    val selectedTask by taskListViewModel.selectedTask.collectAsStateWithLifecycle()
     var newTaskText by remember { mutableStateOf("") }
-    val tasks = listOf(
-        "Start new side project",
-        "Document features",
-        "Watch Compose tutorials"
-    ) // 從 ViewModel 拿
-    val selectedTask = "Document features" // 從 ViewModel 拿
 
     Column(modifier = modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -62,7 +63,10 @@ fun TaskListScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.align(Alignment.End), // 對齊右邊
             shape = MaterialTheme.shapes.medium,
             onClick = {
-
+                if (newTaskText.isBlank()) return@Button
+                taskListViewModel.addNewTask(newTaskText)
+                //清空
+                newTaskText = ""
             }
         ) {
             Text(
@@ -78,9 +82,9 @@ fun TaskListScreen(modifier: Modifier = Modifier) {
         LazyColumn {
             items(tasks) { task ->
                 TaskItem(
-                    taskName = task,
-                    isSelected = task == selectedTask, // 比對是否為選中項
-                    onSelectTask = { /* viewModel.selectTask(task) */ }
+                    taskName = task.description,
+                    isSelected = task.id == selectedTask?.id,
+                    onSelectTask = { taskListViewModel.selectTask(task) }
                 )
             }
         }
