@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -34,7 +35,9 @@ fun MainScreen(modifier: Modifier) {
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect {
             currentTitle = when (it.destination.route) {
+                TIMER -> TIMER
                 TASKS -> "Task List Screen"
+                HISTORY -> HISTORY
                 else -> it.destination.route ?: ""
             }
         }
@@ -58,7 +61,17 @@ fun MainScreen(modifier: Modifier) {
                 .padding(16.dp) //疊加上內容的padding
         ) {
             composable(TIMER) {
-                HomeScreen()
+                HomeScreen(
+                    onNavigateToTaskList = {
+                        navController.navigate(TASKS){
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
             composable(TASKS) {
                 TaskListScreen()

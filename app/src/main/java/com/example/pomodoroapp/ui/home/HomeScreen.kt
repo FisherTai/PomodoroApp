@@ -19,11 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.clickable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(
+    modifier: Modifier = Modifier, 
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
+) {
     val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
     val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
@@ -43,10 +48,19 @@ fun HomeScreen(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hil
                 style = MaterialTheme.typography.displayLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = taskDescribe,
-                style = MaterialTheme.typography.titleLarge
-            )
+            if (taskDescribe.isNotBlank()) {
+                Text(
+                    text = taskDescribe,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            } else {
+                // 如果沒有任務描述，顯示可點擊的提示
+                Text(
+                    text = "點擊新增任務",
+                    style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.clickable { onNavigateToTaskList() }
+                )
+            }
         }
         //元件2：Row擺放"Start/Pause"和"Reset"按鈕
         Row(
