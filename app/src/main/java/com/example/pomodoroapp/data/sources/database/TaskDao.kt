@@ -9,11 +9,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
-    @Insert
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity): Long
 
     @Update
     suspend fun updateTask(task: TaskEntity)
+
+    @Update
+    suspend fun updateTasks(tasks: List<TaskEntity>)
 
     @Delete
     suspend fun deleteTask(task: TaskEntity)
@@ -23,4 +26,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): TaskEntity
+
+    @Query("SELECT * FROM tasks WHERE status = 'IN_PROGRESS'")
+    suspend fun getInProgressTask(): List<TaskEntity>
 }
