@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.Surface
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,14 +28,31 @@ import com.example.pomodoroapp.R
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier, 
+    modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
     onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
 ) {
     val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
     val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
+    HomeContent(
+        countDownState = countDownState,
+        taskDescribe = taskDescribe,
+        timeDisplay = timeDisplay,
+        onClickEvent = { homeViewModel.onClickEvent(it) },
+        onNavigateToTaskList = onNavigateToTaskList
+    )
+}
 
+@Composable
+fun HomeContent(
+    modifier: Modifier = Modifier,
+    countDownState: CountDownState,
+    taskDescribe: String,
+    timeDisplay: String,
+    onClickEvent: (event: HomeClickEvent) -> Unit,
+    onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
+) {
     // UI實作
     Column(modifier.fillMaxSize()) {
         //元件1：Column擺放格式化後的Timer和任務描述
@@ -76,7 +94,7 @@ fun HomeScreen(
             Button(
                 shape = MaterialTheme.shapes.medium,
                 onClick = {
-                    homeViewModel.onClickEvent(HomeClickEvent.StartPauseClicked)
+                    onClickEvent(HomeClickEvent.StartPauseClicked)
                 }
             ) {
                 Text(
@@ -92,7 +110,7 @@ fun HomeScreen(
                 shape = MaterialTheme.shapes.medium,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
                 onClick = {
-                    homeViewModel.onClickEvent(HomeClickEvent.ResetClicked)
+                    onClickEvent(HomeClickEvent.ResetClicked)
                 }) {
                 Text(
                     text = stringResource(R.string.btn_reset),
@@ -109,5 +127,13 @@ fun HomeScreen(
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    Surface {
+        HomeContent(
+            countDownState = CountDownState.STOP,
+            taskDescribe = "任務描述",
+            timeDisplay = "25:00",
+            onClickEvent = {  },
+            onNavigateToTaskList = { }
+        )
+    }
 }

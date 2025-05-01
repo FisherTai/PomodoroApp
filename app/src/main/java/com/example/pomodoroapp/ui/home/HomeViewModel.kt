@@ -3,6 +3,7 @@ package com.example.pomodoroapp.ui.home
 import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pomodoroapp.data.repository.TaskRepository
 import com.example.pomodoroapp.util.TimerUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -25,7 +27,9 @@ sealed class HomeClickEvent {
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val taskRepository: TaskRepository
+) : ViewModel() {
 
     // 用Duration替代timestamp表示
     private val defaultTimeDuration = 25.minutes
@@ -34,8 +38,15 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val _countDownState = MutableStateFlow(CountDownState.STOP)
     val countDownState: StateFlow<CountDownState> = _countDownState.asStateFlow()
 
-    private val _taskDescribe = MutableStateFlow("")
-    val taskDescribe: StateFlow<String> = _taskDescribe.asStateFlow()
+    val taskDescribe: StateFlow<String> = taskRepository
+        .getInProgressTaskFlow()
+        .map { it.firstOrNull()?.description.orEmpty() }
+        .distinctUntilChanged() // 忽略重复描述
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(2000), //當有訂閱者時才啟動，在沒有訂閱者後閒置2秒才停止
+            initialValue = ""                                  // 如果需要可以改成默认描述
+        )
 
     private val _timeLeft = MutableStateFlow(defaultTimeDuration)
 

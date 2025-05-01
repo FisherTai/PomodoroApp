@@ -16,6 +16,7 @@ interface TaskRepository {
     suspend fun updateTasks(tasks: List<TaskEntity>)
     suspend fun getTask(id: Int): TaskEntity?
     suspend fun getInProgressTask(): List<TaskEntity>
+    fun getInProgressTaskFlow(): Flow<List<TaskEntity>>
 }
 
 @Singleton
@@ -41,4 +42,5 @@ class TaskRepositoryImpl @Inject constructor(private val taskDao: TaskDao) : Tas
 
     override suspend fun getInProgressTask(): List<TaskEntity> = taskDao.getInProgressTask()
 
+    override fun getInProgressTaskFlow(): Flow<List<TaskEntity>> = taskDao.getInProgressTaskFlow()
 }
