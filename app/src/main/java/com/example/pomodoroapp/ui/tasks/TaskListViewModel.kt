@@ -7,15 +7,16 @@ import com.example.pomodoroapp.data.repository.TaskRepository
 import com.example.pomodoroapp.data.sources.database.TaskEntity
 import com.example.pomodoroapp.data.sources.database.TaskStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
+
+sealed class TaskScreenClickEvent {
+    data class AddNewTask(val description: String) : TaskScreenClickEvent()
+    data class SelectTask(val task: Task) : TaskScreenClickEvent()
+}
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
@@ -35,26 +36,38 @@ class TaskListViewModel @Inject constructor(
         emptyList()
     )
 
-    private val _selectedTask = MutableStateFlow(tasks.value.firstOrNull())
-    val selectedTask: StateFlow<Task?> = _selectedTask
-
-    fun selectTask(selectTask: Task) {
-        _selectedTask.value = tasks.value.find { it.id == selectTask.id }
+    fun onClickEvent(event: TaskScreenClickEvent) {
+        when (event) {
+            is TaskScreenClickEvent.AddNewTask -> {
+                addNewTask(event.description)
+            }
+            is TaskScreenClickEvent.SelectTask -> {
+                selectTask(event.task)
+            }
+        }
     }
 
-    fun addNewTask(description: String) {
+    private fun selectTask(selectTask: Task) {
         viewModelScope.launch {
-            val id = taskRepository.addTask(description)
-            // 等待 tasks Flow 更新後才做selectTask，但設置超時
-            val updatedTask = withTimeoutOrNull(2000) { // 2秒超時
-                tasks.first { taskList ->
-                    taskList.any { it.id == id }
-                }
+            val currentChooseTasks = taskRepository.getInProgressTask()
+            val updatedTaskEntities = mutableListOf<TaskEntity>()
+            //取消選中，再添加選中
+            val unselectedTasks = currentChooseTasks.map { it.copy(status = TaskStatus.TODO) }
+            updatedTaskEntities.addAll(unselectedTasks)
+            taskRepository.getTask(selectTask.id)?.let {
+                updatedTaskEntities.add(it.copy(status = TaskStatus.IN_PROGRESS))
             }
-            // 如果在超時內找到了更新後的任務，則使用它
-            updatedTask?.find { it.id == id }?.let {
-                selectTask(it)
-            }
+            taskRepository.updateTasks(updatedTaskEntities)
+        }
+    }
+
+    private fun addNewTask(description: String) {
+        viewModelScope.launch {
+            val selectTasks = taskRepository.getInProgressTask()
+            val unselectedTasks = selectTasks.map { it.copy(status = TaskStatus.TODO) }
+            //先取消選中再新增Task
+            taskRepository.updateTasks(unselectedTasks)
+            taskRepository.addTask(description)
         }
     }
 

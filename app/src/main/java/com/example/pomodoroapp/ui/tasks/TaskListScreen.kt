@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -48,22 +47,15 @@ fun TaskListScreen(
     taskListViewModel: TaskListViewModel = hiltViewModel()
 ) {
     val tasks by taskListViewModel.tasks.collectAsStateWithLifecycle()
-    val selectedTask by taskListViewModel.selectedTask.collectAsStateWithLifecycle()
     var newTaskText by remember { mutableStateOf("") }
     TaskListComponent(
         modifier = modifier,
         newTaskText = newTaskText,
         tasks = tasks,
-        selectedTask = selectedTask,
         onInputValueChange = { newTaskText = it },
-        onSelectTask = { task ->
-            taskListViewModel.selectTask(task)
-        },
-        onAddTask = {
-            if (newTaskText.isBlank()) {
-
-            } else {
-                taskListViewModel.addNewTask(newTaskText)
+        onClickEvent = {
+            taskListViewModel.onClickEvent(it)
+            if (it is TaskScreenClickEvent.AddNewTask) {
                 //清空
                 newTaskText = ""
             }
@@ -76,10 +68,8 @@ fun TaskListComponent(
     modifier: Modifier = Modifier,
     newTaskText: String,
     tasks: List<Task>,
-    selectedTask: Task?,
+    onClickEvent: (TaskScreenClickEvent) -> Unit = {},
     onInputValueChange: (String) -> Unit = {},
-    onAddTask: () -> Unit = {},
-    onSelectTask: (Task) -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -97,7 +87,9 @@ fun TaskListComponent(
             modifier = Modifier.align(Alignment.End), // 對齊右邊
             shape = MaterialTheme.shapes.medium,
             onClick = {
-                onAddTask()
+                if (newTaskText.isNotBlank()) {
+                    onClickEvent(TaskScreenClickEvent.AddNewTask(newTaskText))
+                }
             }
         ) {
             Text(
@@ -127,9 +119,9 @@ fun TaskListComponent(
                 items(tasks) { task ->
                     TaskItem(
                         taskName = task.description,
-                        isSelected = task.id == selectedTask?.id,
+                        isSelected = task.isChoose,
                         onSelectTask = {
-                            onSelectTask(task)
+                            onClickEvent(TaskScreenClickEvent.SelectTask(task))
                         }
                     )
                 }
@@ -230,11 +222,7 @@ fun TaskListScreenPreview() {
             tasks = listOf(
                 Task(id = 1, description = "Task 1", isChoose = false),
                 Task(id = 2, description = "Task 2", isChoose = true)
-            ),
-            selectedTask = null,
-            onInputValueChange = { },
-            onAddTask = { },
-            onSelectTask = { }
+            )
         )
     }
 }
@@ -246,11 +234,7 @@ fun TaskListEmptyScreenPreview() {
         TaskListComponent(
             modifier = Modifier.padding(16.dp),
             newTaskText = stringResource(R.string.hint_txt_new_task),
-            tasks = listOf(),
-            selectedTask = null,
-            onInputValueChange = { },
-            onAddTask = { },
-            onSelectTask = { }
+            tasks = listOf()
         )
     }
 }
