@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -35,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pomodoroapp.data.model.Task
 
 
 @Composable
@@ -42,15 +45,44 @@ fun TaskListScreen(
     modifier: Modifier = Modifier,
     taskListViewModel: TaskListViewModel = hiltViewModel()
 ) {
-
     val tasks by taskListViewModel.tasks.collectAsStateWithLifecycle()
     val selectedTask by taskListViewModel.selectedTask.collectAsStateWithLifecycle()
     var newTaskText by remember { mutableStateOf("") }
+    TaskListComponent(
+        modifier = modifier,
+        newTaskText = newTaskText,
+        tasks = tasks,
+        selectedTask = selectedTask,
+        onInputValueChange = { newTaskText = it },
+        onSelectTask = { task ->
+            taskListViewModel.selectTask(task)
+        },
+        onAddTask = {
+            if (newTaskText.isBlank()) {
 
+            } else {
+                taskListViewModel.addNewTask(newTaskText)
+                //清空
+                newTaskText = ""
+            }
+        },
+    )
+}
+
+@Composable
+fun TaskListComponent(
+    modifier: Modifier = Modifier,
+    newTaskText: String,
+    tasks: List<Task>,
+    selectedTask: Task?,
+    onInputValueChange: (String) -> Unit = {},
+    onAddTask: () -> Unit = {},
+    onSelectTask: (Task) -> Unit = {}
+) {
     Column(modifier = modifier.fillMaxSize()) {
         OutlinedTextField(
             value = newTaskText,
-            onValueChange = { newTaskText = it },
+            onValueChange = { onInputValueChange(it) },
             label = { Text("New task") },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium //這會有圓角效果
@@ -63,10 +95,7 @@ fun TaskListScreen(
             modifier = Modifier.align(Alignment.End), // 對齊右邊
             shape = MaterialTheme.shapes.medium,
             onClick = {
-                if (newTaskText.isBlank()) return@Button
-                taskListViewModel.addNewTask(newTaskText)
-                //清空
-                newTaskText = ""
+                onAddTask()
             }
         ) {
             Text(
@@ -79,13 +108,29 @@ fun TaskListScreen(
         //分隔線
         HorizontalDivider()
 
-        LazyColumn {
-            items(tasks) { task ->
-                TaskItem(
-                    taskName = task.description,
-                    isSelected = task.id == selectedTask?.id,
-                    onSelectTask = { taskListViewModel.selectTask(task) }
+        if (tasks.isEmpty()){
+            //置中、Display、hint色的Text
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No tasks available",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
+            }
+        } else {
+            LazyColumn {
+                items(tasks) { task ->
+                    TaskItem(
+                        taskName = task.description,
+                        isSelected = task.id == selectedTask?.id,
+                        onSelectTask = {
+                            onSelectTask(task)
+                        }
+                    )
+                }
             }
         }
     }
@@ -100,7 +145,8 @@ fun TaskItem(taskName: String, isSelected: Boolean, onSelectTask: () -> Unit) {
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Checkbox(checked = isSelected, onCheckedChange = { onSelectTask() })
+//        Checkbox(checked = isSelected, onCheckedChange = { onSelectTask() })
+//        RadioButton(selected = isSelected, onClick = { onSelectTask() })
         // 自訂圓形Checkbox
         CircularCheckbox(checked = isSelected, onCheckedChange = { onSelectTask() })
 
@@ -175,5 +221,34 @@ fun CircularCheckbox(
 @Preview
 @Composable
 fun TaskListScreenPreview() {
-    TaskListScreen(Modifier.padding(16.dp))
+    Surface {
+        TaskListComponent(
+            modifier = Modifier.padding(16.dp),
+            newTaskText = "New Task",
+            tasks = listOf(
+                Task(id = 1, description = "Task 1", isChoose = false),
+                Task(id = 2, description = "Task 2", isChoose = true)
+            ),
+            selectedTask = null,
+            onInputValueChange = { },
+            onAddTask = { },
+            onSelectTask = { }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TaskListEmptyScreenPreview() {
+    Surface {
+        TaskListComponent(
+            modifier = Modifier.padding(16.dp),
+            newTaskText = "New Task",
+            tasks = listOf(),
+            selectedTask = null,
+            onInputValueChange = { },
+            onAddTask = { },
+            onSelectTask = { }
+        )
+    }
 }
