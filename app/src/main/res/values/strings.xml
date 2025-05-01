@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">PomodoroApp</string>
+    <string name="hint_message_add_new">Click to add a task</string>
+    <string name="btn_pause">Pause</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_reset">Reset</string>
+    <string name="btn_add">Add</string>
+    <string name="hint_txt_new_task">New task</string>
+    <string name="hint_txt_no_task">No tasks available</string>
 </resources>

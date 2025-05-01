@@ -33,10 +33,12 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pomodoroapp.R
 import com.example.pomodoroapp.data.model.Task
 
 
@@ -83,7 +85,7 @@ fun TaskListComponent(
         OutlinedTextField(
             value = newTaskText,
             onValueChange = { onInputValueChange(it) },
-            label = { Text("New task") },
+            label = { Text(stringResource(R.string.hint_txt_new_task)) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium //這會有圓角效果
         )
@@ -99,7 +101,7 @@ fun TaskListComponent(
             }
         ) {
             Text(
-                text = "Add",
+                text = stringResource(R.string.btn_add),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -115,7 +117,7 @@ fun TaskListComponent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No tasks available",
+                    text = stringResource(R.string.hint_txt_no_task),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -224,7 +226,7 @@ fun TaskListScreenPreview() {
     Surface {
         TaskListComponent(
             modifier = Modifier.padding(16.dp),
-            newTaskText = "New Task",
+            newTaskText = stringResource(R.string.hint_txt_new_task),
             tasks = listOf(
                 Task(id = 1, description = "Task 1", isChoose = false),
                 Task(id = 2, description = "Task 2", isChoose = true)
@@ -243,7 +245,7 @@ fun TaskListEmptyScreenPreview() {
     Surface {
         TaskListComponent(
             modifier = Modifier.padding(16.dp),
-            newTaskText = "New Task",
+            newTaskText = stringResource(R.string.hint_txt_new_task),
             tasks = listOf(),
             selectedTask = null,
             onInputValueChange = { },

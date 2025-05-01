@@ -20,8 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.pomodoroapp.R
 
 @Composable
 fun HomeScreen(
@@ -56,7 +58,7 @@ fun HomeScreen(
             } else {
                 // 如果沒有任務描述，顯示可點擊的提示
                 Text(
-                    text = "點擊新增任務",
+                    text = stringResource(id = R.string.hint_message_add_new),
                     style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
                     modifier = Modifier.clickable { onNavigateToTaskList() }
                 )
@@ -78,7 +80,7 @@ fun HomeScreen(
                 }
             ) {
                 Text(
-                    text = if (countDownState == CountDownState.RUNNING) "Pause" else "Start",
+                    text = if (countDownState == CountDownState.RUNNING) stringResource(R.string.btn_pause) else stringResource(R.string.btn_start),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -93,7 +95,7 @@ fun HomeScreen(
                     homeViewModel.onClickEvent(HomeClickEvent.ResetClicked)
                 }) {
                 Text(
-                    text = "Reset",
+                    text = stringResource(R.string.btn_reset),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleLarge
                 )

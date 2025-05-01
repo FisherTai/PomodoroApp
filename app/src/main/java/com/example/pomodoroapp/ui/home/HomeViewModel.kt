@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val _countDownState = MutableStateFlow(CountDownState.STOP)
     val countDownState: StateFlow<CountDownState> = _countDownState.asStateFlow()
 
-    private val _taskDescribe = MutableStateFlow("測試任務")
+    private val _taskDescribe = MutableStateFlow("")
     val taskDescribe: StateFlow<String> = _taskDescribe.asStateFlow()
 
     private val _timeLeft = MutableStateFlow(defaultTimeDuration)
