@@ -69,7 +69,9 @@ fun HomeContent(
                 if (homeUiState.currentPhase == TimerPhase.FOCUS){
                     Text(
                         text = homeUiState.taskDescribe,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
