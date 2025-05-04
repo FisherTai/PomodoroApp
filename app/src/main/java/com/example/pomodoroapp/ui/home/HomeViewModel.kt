@@ -3,7 +3,9 @@ package com.example.pomodoroapp.ui.home
 import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pomodoroapp.data.repository.HistoryRepository
 import com.example.pomodoroapp.data.repository.TaskRepository
+import com.example.pomodoroapp.data.sources.database.HistoryEntity
 import com.example.pomodoroapp.util.TimerUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -61,7 +63,8 @@ enum class CountDownState {
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
     // 用Duration替代timestamp表示
@@ -182,6 +185,9 @@ class HomeViewModel @Inject constructor(
                     _timeLeft.update { timeLeft }
                     //如果timeLeft是0
                     if (timeLeft.inWholeMilliseconds == 0L) {
+                        if (currentPhase.value == TimerPhase.FOCUS){
+                            onFocusComplete()
+                        }
                         nextPhase()
                     }
                 }
@@ -197,5 +203,16 @@ class HomeViewModel @Inject constructor(
             TimerPhase.BIG_BREAK -> _timeLeft.update { defaultBigBreakTimeDuration }
         }
         _countDownState.update { CountDownState.STOP }
+    }
+
+    private suspend fun onFocusComplete(){
+        currentProgressTask.value?.let {
+            historyRepository.insertHistory(
+                HistoryEntity(
+                    taskId = it.id,
+                    timestamp = System.currentTimeMillis(),
+                )
+            )
+        }
     }
 }
