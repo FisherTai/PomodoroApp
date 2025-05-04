@@ -140,6 +140,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun startTimer() {
+        countdownJob?.cancel()
         countdownJob = viewModelScope.launch {
             TimerUtils.countdownFLow(_timeLeft.value.inWholeMilliseconds, 1000)
                 .map { timeLeft -> timeLeft.toDuration(kotlin.time.DurationUnit.MILLISECONDS) }
@@ -155,7 +156,12 @@ class HomeViewModel @Inject constructor(
 
     private fun resetCountDown() {
         countdownJob?.cancel()
-        _timeLeft.update { defaultFocusTimeDuration } // 重置時間
+        // 重置時間
+        when(currentPhase.value){
+            TimerPhase.FOCUS -> _timeLeft.update { defaultFocusTimeDuration }
+            TimerPhase.BREAK -> _timeLeft.update { defaultBreakTimeDuration }
+            TimerPhase.BIG_BREAK -> _timeLeft.update { defaultBigBreakTimeDuration }
+        }
         _countDownState.update { CountDownState.STOP }
     }
 }
