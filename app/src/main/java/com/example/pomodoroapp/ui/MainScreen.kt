@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pomodoroapp.ui.theme.PomodoroAppTheme
 import com.example.pomodoroapp.ui.components.BottomBar
 import com.example.pomodoroapp.ui.components.TopBar
+import com.example.pomodoroapp.ui.history.HistoryScreen
 import com.example.pomodoroapp.ui.home.HomeScreen
 import com.example.pomodoroapp.ui.tasks.TaskListScreen
 
@@ -76,7 +77,9 @@ fun MainScreen(modifier: Modifier) {
             composable(TASKS) {
                 TaskListScreen()
             }
-            composable(HISTORY) {}
+            composable(HISTORY) {
+                HistoryScreen()
+            }
         }
     }
 }

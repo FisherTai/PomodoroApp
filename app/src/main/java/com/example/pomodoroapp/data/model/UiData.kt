@@ -11,17 +11,17 @@ class TaskUIData(val id: Int, val description: String, val isChoose: Boolean) {
     }
 }
 
-//data class HistoryUIData(
-//    val taskId: Int,
-//    val title: String,
-//    val timeCount: Int
-//){
-//    companion object {
-//        fun build(historyWithTask: HistoryWithTask): HistoryUIData =
-//            HistoryUIData(
-//                taskId = historyWithTask.taskId,
-//                title = historyWithTask.taskDescription,
-//                timeCount = 1 // 每條歷史記錄作為一次計數
-//            )
-//    }
-//}
+data class HistoryUIData(
+    val taskId: Int,
+    val title: String,
+    val timeCount: Int
+){
+    companion object {
+        fun build(historyWithTask: HistoryWithTask): HistoryUIData =
+            HistoryUIData(
+                taskId = historyWithTask.taskId,
+                title = historyWithTask.taskDescription,
+                timeCount = 1 // 每條歷史記錄作為一次計數
+            )
+    }
+}

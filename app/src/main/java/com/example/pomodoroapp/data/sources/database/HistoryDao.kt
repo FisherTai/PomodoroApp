@@ -49,7 +49,15 @@ interface HistoryDao {
     @Query("SELECT * FROM histories WHERE timestamp >= :startOfDay AND timestamp < :startOfNextDay")
     fun getHistoriesByDate(startOfDay: Long, startOfNextDay: Long): Flow<List<HistoryEntity>>
 
-    /* -------------------------------------查詢操作(TaskWithHistories)------------------------------------- */
+    @Query("""
+        SELECT h.id, h.taskId, h.timestamp, t.description as taskDescription
+        FROM histories h
+        INNER JOIN tasks t ON h.taskId = t.id
+        ORDER BY h.timestamp DESC
+        """
+    )
+    fun getAllHistoriesWithTaskDescription(): Flow<List<HistoryWithTask>>
+
     @Transaction
     @Query("SELECT * FROM tasks WHERE id IN (SELECT DISTINCT taskId FROM histories)")
     fun getTasksWithHistories(): Flow<List<TaskWithHistories>>

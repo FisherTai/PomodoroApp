@@ -1,5 +1,7 @@
 package com.example.pomodoroapp.di
 
+import com.example.pomodoroapp.data.repository.HistoryRepository
+import com.example.pomodoroapp.data.repository.HistoryRepositoryImpl
 import com.example.pomodoroapp.data.repository.TaskRepository
 import com.example.pomodoroapp.data.repository.TaskRepositoryImpl
 import dagger.Binds
@@ -17,4 +19,10 @@ abstract class RepositoryModule {
     abstract fun bindTaskRepository(
         taskRepositoryImpl: TaskRepositoryImpl
     ): TaskRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHistoryRepository(
+        historyRepositoryImpl: HistoryRepositoryImpl
+    ): HistoryRepository
 }
