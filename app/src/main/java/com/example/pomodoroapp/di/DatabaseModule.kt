@@ -49,9 +49,14 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "pomodoro_app_database"
-        ).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
     }
 
     @Provides
     fun provideTaskDao(appDatabase: AppDatabase) = appDatabase.taskDao()
+
+    @Provides
+    fun provideHistoryDao(appDatabase: AppDatabase) = appDatabase.historyDao()
 }
