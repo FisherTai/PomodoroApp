@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -20,7 +21,20 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toDuration
 
-// 2. UI Event
+
+/**
+ * UI State
+ */
+data class HomeUiState(
+    val countDownState: CountDownState,
+    val taskDescribe: String,
+    val currentPhase: TimerPhase,
+    val onClickEvent: (event: HomeClickEvent) -> Unit
+)
+
+/**
+ * UI Event
+ */
 sealed class HomeClickEvent {
     data object StartPauseClicked : HomeClickEvent()
     data object ResetClicked : HomeClickEvent()
@@ -71,16 +85,14 @@ class HomeViewModel @Inject constructor(
     private val _currentPhase = MutableStateFlow(TimerPhase.FOCUS)
     val currentPhase: StateFlow<TimerPhase> = _currentPhase.asStateFlow()
 
-    //任務名稱
-    val taskDescribe: StateFlow<String> = taskRepository
-        .getInProgressTaskFlow()
-        .map { it.firstOrNull()?.description.orEmpty() }
-        .distinctUntilChanged() // 忽略重复描述
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(2000), //當有訂閱者時才啟動，在沒有訂閱者後閒置2秒才停止
-            initialValue = ""                                  // 如果需要可以改成默认描述
-        )
+    private val currentProgressTask = taskRepository
+            .getInProgressTaskFlow()
+            .distinctUntilChanged() // 去重
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(2000), //當有訂閱者時才啟動，在沒有訂閱者後閒置2秒才停止
+                initialValue = null
+            )
 
     // 剩餘計時時間
     private val _timeLeft = MutableStateFlow(defaultFocusTimeDuration)
@@ -95,7 +107,29 @@ class HomeViewModel @Inject constructor(
             initialValue = DateUtils.formatElapsedTime(_timeLeft.value.inWholeSeconds)
         )
 
-    fun onClickEvent(event: HomeClickEvent) {
+    val homeUiState: StateFlow<HomeUiState> = combine(
+        countDownState,
+        currentProgressTask,
+        currentPhase
+    ) { countDownState, currentProgressTask, currentPhase ->
+        HomeUiState(
+            countDownState = countDownState,
+            taskDescribe = currentProgressTask?.description ?: "",
+            currentPhase = currentPhase,
+            onClickEvent = { onClickEvent(it) }
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState(
+            countDownState = CountDownState.STOP,
+            taskDescribe = "",
+            currentPhase = TimerPhase.FOCUS,
+            onClickEvent = { onClickEvent(it) }
+        )
+    )
+
+    private fun onClickEvent(event: HomeClickEvent) {
         when (event) {
             HomeClickEvent.StartPauseClicked -> toggleStartPause()
             HomeClickEvent.ResetClicked -> resetCountDown()

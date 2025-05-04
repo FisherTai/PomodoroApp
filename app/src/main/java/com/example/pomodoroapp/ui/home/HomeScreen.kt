@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Surface
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pomodoroapp.R
@@ -32,17 +33,12 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
 ) {
-    val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
-    val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
-    val currentPhase by homeViewModel.currentPhase.collectAsStateWithLifecycle()
+    val homeUiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
 
     HomeContent(
-        countDownState = countDownState,
-        taskDescribe = taskDescribe,
+        homeUiState = homeUiState,
         timeDisplay = timeDisplay,
-        currentPhase = currentPhase,
-        onClickEvent = { homeViewModel.onClickEvent(it) },
         onNavigateToTaskList = onNavigateToTaskList
     )
 }
@@ -50,11 +46,8 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    countDownState: CountDownState,
-    taskDescribe: String,
+    homeUiState: HomeUiState,
     timeDisplay: String,
-    currentPhase: TimerPhase,
-    onClickEvent: (event: HomeClickEvent) -> Unit,
     onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
 ) {
     // UI實作
@@ -72,16 +65,21 @@ fun HomeContent(
                 style = MaterialTheme.typography.displayLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
-            if (taskDescribe.isNotBlank()) {
-                if (currentPhase == TimerPhase.FOCUS){
+            if (homeUiState.taskDescribe.isNotBlank()) {
+                if (homeUiState.currentPhase == TimerPhase.FOCUS){
                     Text(
-                        text = taskDescribe,
+                        text = homeUiState.taskDescribe,
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (currentPhase == TimerPhase.FOCUS) stringResource(id = R.string.timer_phase_focus) else stringResource(id = R.string.timer_phase_break),
+                    text =
+                        if (homeUiState.currentPhase == TimerPhase.FOCUS)
+                            stringResource(id = R.string.timer_phase_focus)
+                        else
+                            stringResource(id = R.string.timer_phase_break)
+                    ,
                     style = MaterialTheme.typography.titleMedium
                 )
             } else {
@@ -105,11 +103,11 @@ fun HomeContent(
             Button(
                 shape = MaterialTheme.shapes.medium,
                 onClick = {
-                    onClickEvent(HomeClickEvent.StartPauseClicked)
+                    homeUiState.onClickEvent(HomeClickEvent.StartPauseClicked)
                 }
             ) {
                 Text(
-                    text = if (countDownState == CountDownState.RUNNING) stringResource(R.string.btn_pause) else stringResource(R.string.btn_start),
+                    text = if (homeUiState.countDownState == CountDownState.RUNNING) stringResource(R.string.btn_pause) else stringResource(R.string.btn_start),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -121,7 +119,7 @@ fun HomeContent(
                 shape = MaterialTheme.shapes.medium,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
                 onClick = {
-                    onClickEvent(HomeClickEvent.ResetClicked)
+                    homeUiState.onClickEvent(HomeClickEvent.ResetClicked)
                 }) {
                 Text(
                     text = stringResource(R.string.btn_reset),
@@ -138,13 +136,16 @@ fun HomeContent(
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    Surface {
+    val homeUiState = HomeUiState(
+    countDownState = CountDownState.STOP,
+    taskDescribe = "任務描述",
+    currentPhase = TimerPhase.FOCUS,
+    onClickEvent = { }
+    )
+    Surface() {
         HomeContent(
-            countDownState = CountDownState.STOP,
-            taskDescribe = "任務描述",
+            homeUiState = homeUiState,
             timeDisplay = "25:00",
-            currentPhase = TimerPhase.FOCUS,
-            onClickEvent = {  },
             onNavigateToTaskList = { }
         )
     }
