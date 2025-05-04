@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pomodoroapp.R
-import com.example.pomodoroapp.data.model.Task
+import com.example.pomodoroapp.data.model.TaskUIData
 
 
 @Composable
@@ -67,7 +67,7 @@ fun TaskListScreen(
 fun TaskListComponent(
     modifier: Modifier = Modifier,
     newTaskText: String,
-    tasks: List<Task>,
+    tasks: List<TaskUIData>,
     onClickEvent: (TaskScreenClickEvent) -> Unit = {},
     onInputValueChange: (String) -> Unit = {},
 ) {
@@ -220,8 +220,8 @@ fun TaskListScreenPreview() {
             modifier = Modifier.padding(16.dp),
             newTaskText = stringResource(R.string.hint_txt_new_task),
             tasks = listOf(
-                Task(id = 1, description = "Task 1", isChoose = false),
-                Task(id = 2, description = "Task 2", isChoose = true)
+                TaskUIData(id = 1, description = "Task 1", isChoose = false),
+                TaskUIData(id = 2, description = "Task 2", isChoose = true)
             )
         )
     }

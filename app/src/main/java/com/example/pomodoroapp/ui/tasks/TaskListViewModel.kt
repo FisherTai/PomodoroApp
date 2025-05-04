@@ -2,7 +2,7 @@ package com.example.pomodoroapp.ui.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pomodoroapp.data.model.Task
+import com.example.pomodoroapp.data.model.TaskUIData
 import com.example.pomodoroapp.data.repository.TaskRepository
 import com.example.pomodoroapp.data.sources.database.TaskEntity
 import com.example.pomodoroapp.data.sources.database.TaskStatus
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 sealed class TaskScreenClickEvent {
     data class AddNewTask(val description: String) : TaskScreenClickEvent()
-    data class SelectTask(val task: Task) : TaskScreenClickEvent()
+    data class SelectTask(val task: TaskUIData) : TaskScreenClickEvent()
 }
 
 @HiltViewModel
@@ -25,9 +25,9 @@ class TaskListViewModel @Inject constructor(
 
     val tasks = taskRepository.tasks.map { taskEntities ->
         //轉換成Tasks
-        mutableListOf<Task>().apply {
+        mutableListOf<TaskUIData>().apply {
             taskEntities.forEach { taskEntity ->
-                add(Task.build(taskEntity))
+                add(TaskUIData.build(taskEntity))
             }
         }
     }.stateIn(
@@ -47,7 +47,7 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
-    private fun selectTask(selectTask: Task) {
+    private fun selectTask(selectTask: TaskUIData) {
         viewModelScope.launch {
             val currentChooseTasks = taskRepository.getInProgressTask()
             val updatedTaskEntities = mutableListOf<TaskEntity>()

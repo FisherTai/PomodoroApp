@@ -31,5 +31,5 @@ interface TaskDao {
     suspend fun getInProgressTask(): List<TaskEntity>
 
     @Query("SELECT * FROM tasks WHERE status = 'IN_PROGRESS'")
-    fun getInProgressTaskFlow(): Flow<List<TaskEntity>>
+    fun getInProgressTaskFlow(): Flow<TaskEntity?>
 }
