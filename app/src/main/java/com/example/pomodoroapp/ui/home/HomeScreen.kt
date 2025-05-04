@@ -35,10 +35,13 @@ fun HomeScreen(
     val countDownState by homeViewModel.countDownState.collectAsStateWithLifecycle()
     val taskDescribe by homeViewModel.taskDescribe.collectAsStateWithLifecycle()
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
+    val currentPhase by homeViewModel.currentPhase.collectAsStateWithLifecycle()
+
     HomeContent(
         countDownState = countDownState,
         taskDescribe = taskDescribe,
         timeDisplay = timeDisplay,
+        currentPhase = currentPhase,
         onClickEvent = { homeViewModel.onClickEvent(it) },
         onNavigateToTaskList = onNavigateToTaskList
     )
@@ -50,6 +53,7 @@ fun HomeContent(
     countDownState: CountDownState,
     taskDescribe: String,
     timeDisplay: String,
+    currentPhase: TimerPhase,
     onClickEvent: (event: HomeClickEvent) -> Unit,
     onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
 ) {
@@ -69,9 +73,16 @@ fun HomeContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             if (taskDescribe.isNotBlank()) {
+                if (currentPhase == TimerPhase.FOCUS){
+                    Text(
+                        text = taskDescribe,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = taskDescribe,
-                    style = MaterialTheme.typography.titleLarge
+                    text = if (currentPhase == TimerPhase.FOCUS) stringResource(id = R.string.timer_phase_focus) else stringResource(id = R.string.timer_phase_break),
+                    style = MaterialTheme.typography.titleMedium
                 )
             } else {
                 // 如果沒有任務描述，顯示可點擊的提示
@@ -132,6 +143,7 @@ fun HomeScreenPreview() {
             countDownState = CountDownState.STOP,
             taskDescribe = "任務描述",
             timeDisplay = "25:00",
+            currentPhase = TimerPhase.FOCUS,
             onClickEvent = {  },
             onNavigateToTaskList = { }
         )

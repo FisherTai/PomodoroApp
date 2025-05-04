@@ -24,6 +24,25 @@ import kotlin.time.toDuration
 sealed class HomeClickEvent {
     data object StartPauseClicked : HomeClickEvent()
     data object ResetClicked : HomeClickEvent()
+    data object SkipPhaseClicked : HomeClickEvent()
+}
+
+/**
+ * 當前的階段
+ */
+enum class TimerPhase {
+    FOCUS,
+    BREAK,
+    BIG_BREAK
+}
+
+/**
+ * 計時的狀態
+ */
+enum class CountDownState {
+    RUNNING,
+    PAUSE,
+    STOP
 }
 
 @HiltViewModel
@@ -32,12 +51,27 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     // 用Duration替代timestamp表示
-    private val defaultTimeDuration = 25.minutes
-    private var countdownJob: Job? = null
+    private val defaultFocusTimeDuration = 25.minutes // 預設專注時間
+    private val defaultBreakTimeDuration = 5.minutes //預設休息時間
+    private val defaultBigBreakTimeDuration = 20.minutes //預設大休息時間
 
+    //快速測試用
+//    private val defaultFocusTimeDuration = 0.2.minutes // 預設專注時間
+//    private val defaultBreakTimeDuration = 0.2.minutes //預設休息時間
+//    private val defaultBigBreakTimeDuration = 0.3.minutes //預設大休息時間
+
+    private var countdownJob: Job? = null
+    private var cycleCount = 0 //循環的次數
+
+    //計時的狀態
     private val _countDownState = MutableStateFlow(CountDownState.STOP)
     val countDownState: StateFlow<CountDownState> = _countDownState.asStateFlow()
 
+    //蕃茄鐘的狀態
+    private val _currentPhase = MutableStateFlow(TimerPhase.FOCUS)
+    val currentPhase: StateFlow<TimerPhase> = _currentPhase.asStateFlow()
+
+    //任務名稱
     val taskDescribe: StateFlow<String> = taskRepository
         .getInProgressTaskFlow()
         .map { it.firstOrNull()?.description.orEmpty() }
@@ -48,7 +82,8 @@ class HomeViewModel @Inject constructor(
             initialValue = ""                                  // 如果需要可以改成默认描述
         )
 
-    private val _timeLeft = MutableStateFlow(defaultTimeDuration)
+    // 剩餘計時時間
+    private val _timeLeft = MutableStateFlow(defaultFocusTimeDuration)
 
     val timeDisplay: StateFlow<String> = _timeLeft
         .map { seconds ->
@@ -64,9 +99,36 @@ class HomeViewModel @Inject constructor(
         when (event) {
             HomeClickEvent.StartPauseClicked -> toggleStartPause()
             HomeClickEvent.ResetClicked -> resetCountDown()
+            HomeClickEvent.SkipPhaseClicked -> nextPhase()
         }
     }
 
+    // 切換到下一個階段
+    private fun nextPhase() {
+        when (currentPhase.value) {
+            TimerPhase.FOCUS -> {
+                if (cycleCount >= 4) {
+                    cycleCount = 0
+                    _currentPhase.update { TimerPhase.BIG_BREAK }
+                    _countDownState.update { CountDownState.STOP }
+                    _timeLeft.update { defaultBigBreakTimeDuration }
+                } else {
+                    cycleCount++
+                    _currentPhase.update { TimerPhase.BREAK }
+                    _countDownState.update { CountDownState.STOP }
+                    _timeLeft.update { defaultBreakTimeDuration }
+                }
+            }
+
+            TimerPhase.BREAK, TimerPhase.BIG_BREAK -> {
+                _currentPhase.update { TimerPhase.FOCUS }
+                _countDownState.update { CountDownState.STOP }
+                _timeLeft.update { defaultFocusTimeDuration }
+            }
+        }
+    }
+
+    //控制倒數計時的操作
     private fun toggleStartPause() {
         if (countDownState.value == CountDownState.RUNNING) {
             countdownJob?.cancel()
@@ -83,19 +145,17 @@ class HomeViewModel @Inject constructor(
                 .map { timeLeft -> timeLeft.toDuration(kotlin.time.DurationUnit.MILLISECONDS) }
                 .collect { timeLeft ->
                     _timeLeft.update { timeLeft }
+                    //如果timeLeft是0
+                    if (timeLeft.inWholeMilliseconds == 0L) {
+                        nextPhase()
+                    }
                 }
         }
     }
 
     private fun resetCountDown() {
         countdownJob?.cancel()
-        _timeLeft.update { defaultTimeDuration } // 重置時間
+        _timeLeft.update { defaultFocusTimeDuration } // 重置時間
         _countDownState.update { CountDownState.STOP }
     }
-}
-
-enum class CountDownState {
-    RUNNING,
-    PAUSE,
-    STOP
 }

@@ -7,4 +7,6 @@
     <string name="btn_add">Add</string>
     <string name="hint_txt_new_task">New task</string>
     <string name="hint_txt_no_task">No tasks available</string>
+    <string name="timer_phase_focus">Focussing</string>
+    <string name="timer_phase_break">Breaking</string>
 </resources>
