@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pomodoroapp.R
 import com.example.pomodoroapp.data.model.TaskUIData
+import com.example.pomodoroapp.ui.theme.onTextHint
 
 
 @Composable
@@ -111,7 +112,7 @@ fun TaskListComponent(
                 Text(
                     text = stringResource(R.string.hint_txt_no_task),
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onTextHint
                 )
             }
         } else {
