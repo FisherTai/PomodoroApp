@@ -17,11 +17,11 @@ data class HistoryUIData(
     val timeCount: Int
 ){
     companion object {
-        fun build(historyWithTask: HistoryWithTask): HistoryUIData =
+        fun build(historyWithTask: HistoryWithTask, count: Int = 1): HistoryUIData =
             HistoryUIData(
                 taskId = historyWithTask.taskId,
                 title = historyWithTask.taskDescription,
-                timeCount = 1 // 每條歷史記錄作為一次計數
+                timeCount = count // 每條歷史記錄作為一次計數
             )
     }
 }
