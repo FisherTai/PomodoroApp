@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">PomodoroApp</string>
-    <string name="hint_message_add_new">Click to add a task</string>
+    <string name="hint_message_add_new1">Click</string>
+    <string name="hint_message_add_new2">to add a task</string>
+    <string name="hint_message_welcome">Welcome!</string>
     <string name="btn_pause">Pause</string>
     <string name="btn_start">Start</string>
     <string name="btn_reset">Reset</string>
     <string name="btn_add">Add</string>
     <string name="hint_txt_new_task">New task</string>
-    <string name="hint_txt_no_task">No tasks available</string>
+    <string name="hint_txt_no_task">There are no tasks right now.\n You can add one using the section above!</string>
     <string name="timer_phase_focus">Focussing</string>
     <string name="timer_phase_break">Breaking</string>
 </resources>

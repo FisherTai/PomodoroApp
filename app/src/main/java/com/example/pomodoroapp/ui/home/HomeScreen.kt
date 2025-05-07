@@ -21,7 +21,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pomodoroapp.R
@@ -89,13 +93,46 @@ fun HomeContent(
                 )
             } else {
                 // 如果沒有任務描述，顯示可點擊的提示
+                Text(
+                    text = stringResource(id = R.string.hint_message_welcome),
+                    style = MaterialTheme.typography.displaySmall.copy(color = MaterialTheme.colorScheme.primary),
+                    textAlign = TextAlign.Center
+                )
                 TextButton(
                     onClick = { onNavigateToTaskList() },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
                 ){
                     Text(
-                        text = stringResource(id = R.string.hint_message_add_new),
+                        text = buildAnnotatedString {
+                            //不知道為何用withStyle來下Welcome會導致Click在色塊內被往下推，所以放棄
+//                            withStyle(
+//                                style = SpanStyle(
+//                                    fontSize = MaterialTheme.typography.displaySmall.fontSize,
+//                                )
+//                            ) {
+//                                append(stringResource(id = R.string.hint_message_welcome))
+//                                append("\n\n")
+//                            }
+
+                            //加入背景色
+                            withStyle(
+                                style = SpanStyle(
+                                    background = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            ) {
+                                append(" ")
+                                append(stringResource(id = R.string.hint_message_add_new1))
+                                append(" ")
+                            }
+                            //最後的
+                            append(" ")
+                            append(stringResource(id = R.string.hint_message_add_new2))
+                        },
                         style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -162,6 +199,24 @@ fun HomeScreenPreview() {
     val homeUiState = HomeUiState(
     countDownState = CountDownState.STOP,
     taskDescribe = "任務描述",
+    currentPhase = TimerPhase.FOCUS,
+    onClickEvent = { }
+    )
+    Surface() {
+        HomeContent(
+            homeUiState = homeUiState,
+            timeDisplay = "25:00",
+            onNavigateToTaskList = { }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreenEmptyPreview() {
+    val homeUiState = HomeUiState(
+    countDownState = CountDownState.STOP,
+    taskDescribe = "",
     currentPhase = TimerPhase.FOCUS,
     onClickEvent = { }
     )
