@@ -1,5 +1,6 @@
 [versions]
 agp = "8.10.0-alpha08"
+composeSwipebox = "1.2.0"
 hiltNavigationFragment = "1.2.0"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
@@ -17,6 +18,7 @@ navigationCompose = "2.8.9"
 ksp       = "2.0.21-1.0.28"
 hilt      = "2.56.1"
 timber = "5.0.1"
+composeFoundation = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +27,7 @@ androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fr
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler",        version.ref = "roomRuntimeAndroid" }
+compose-swipebox = { module = "io.github.kevinnzou:compose-swipebox", version.ref = "composeSwipebox" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -44,6 +47,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 hilt-android        = { group = "com.google.dagger", name = "hilt-android",          version.ref = "hilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-compose-foundation = { group = "androidx.wear.compose", name = "compose-foundation", version.ref = "composeFoundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
