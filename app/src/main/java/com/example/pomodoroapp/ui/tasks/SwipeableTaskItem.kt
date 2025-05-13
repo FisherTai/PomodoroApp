@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -20,7 +21,9 @@ import kotlinx.coroutines.launch
 fun SwipeBoxAtEnd(
     taskName: String,
     isSelected: Boolean,
-    onSelectTask: () -> Unit
+    onSelectTask: () -> Unit,
+    onDeleteTask: () -> Unit,
+    onEditTask: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     SwipeBox(
@@ -28,18 +31,36 @@ fun SwipeBoxAtEnd(
         swipeDirection = SwipeDirection.EndToStart,
         endContentWidth = 60.dp,
         endContent = { swipeableState, endSwipeProgress ->
+            //刪除按鈕
             SwipeIcon(
                 imageVector = Icons.Outlined.Delete,
                 contentDescription = "Delete",
                 tint = Color.White,
-                background = Color(0xFFFA1E32),
+                background = Color.Red,
                 weight = 1f,
-                iconSize = 20.dp
-            ) {
-                coroutineScope.launch {
-                    swipeableState.animateTo(0)
+                iconSize = 20.dp,
+                onClick = {
+                    onDeleteTask()
+                    coroutineScope.launch {
+                        swipeableState.animateTo(0)
+                    }
                 }
-            }
+            )
+            //編輯按鈕
+            SwipeIcon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = "Edit",
+                tint = Color.White,
+                background =  Color.Green,
+                weight = 1f,
+                iconSize = 20.dp,
+                onClick = {
+                    onEditTask()
+                    coroutineScope.launch {
+                        swipeableState.animateTo(0)
+                    }
+                }
+            )
         }
     ) { swipeableState, startSwipeProgress, endSwipeProgress ->
         TaskItem(

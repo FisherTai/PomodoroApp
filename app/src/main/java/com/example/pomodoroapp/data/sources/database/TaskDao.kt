@@ -18,11 +18,20 @@ interface TaskDao {
     @Update
     suspend fun updateTasks(tasks: List<TaskEntity>)
 
+    @Query("UPDATE tasks SET description = :newDescription WHERE id = :taskId")
+    suspend fun updateTaskDescription(taskId: Int, newDescription: String)
+
     @Delete
     suspend fun deleteTask(task: TaskEntity)
 
+    @Query("UPDATE tasks SET isActive = :isActive WHERE id = :taskId")
+    suspend fun changeTaskActiveStatus(taskId: Int, isActive: Boolean)
+
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM tasks WHERE isActive = 1 ORDER BY createdAt DESC")
+    fun getAllTasksExceptNotActive(): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): TaskEntity

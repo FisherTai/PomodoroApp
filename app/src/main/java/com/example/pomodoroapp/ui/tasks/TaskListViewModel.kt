@@ -16,6 +16,8 @@ import javax.inject.Inject
 sealed class TaskScreenClickEvent {
     data class AddNewTask(val description: String) : TaskScreenClickEvent()
     data class SelectTask(val task: TaskUIData) : TaskScreenClickEvent()
+    data class DeleteTask(val task: TaskUIData) : TaskScreenClickEvent()
+    data class EditTask(val task: TaskUIData) : TaskScreenClickEvent()
 }
 
 @HiltViewModel
@@ -44,7 +46,21 @@ class TaskListViewModel @Inject constructor(
             is TaskScreenClickEvent.SelectTask -> {
                 selectTask(event.task)
             }
+            is TaskScreenClickEvent.DeleteTask -> {
+                closeTask(event.task)
+            }
+            is TaskScreenClickEvent.EditTask -> {
+                editTask(event.task)
+            }
         }
+    }
+
+    private fun closeTask(task: TaskUIData) = viewModelScope.launch {
+        taskRepository.closeTask(task.id)
+    }
+
+    private fun editTask(task: TaskUIData) = viewModelScope.launch {
+        taskRepository.updateTaskDescription(task.id, task.description)
     }
 
     private fun selectTask(selectTask: TaskUIData) {

@@ -115,6 +115,13 @@ fun TaskListComponent(
                         isSelected = task.isChoose,
                         onSelectTask = {
                             onClickEvent(TaskScreenClickEvent.SelectTask(task))
+                        },
+                        onDeleteTask = {
+                            onClickEvent(TaskScreenClickEvent.DeleteTask(task))
+                        },
+                        onEditTask = {
+                            //TODO 還沒完成
+                            onClickEvent(TaskScreenClickEvent.EditTask(task))
                         }
                     )
                 }
