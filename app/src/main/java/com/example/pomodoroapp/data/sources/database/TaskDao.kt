@@ -24,21 +24,21 @@ interface TaskDao {
     @Delete
     suspend fun deleteTask(task: TaskEntity)
 
-    @Query("UPDATE tasks SET isActive = :isActive WHERE id = :taskId")
-    suspend fun changeTaskActiveStatus(taskId: Int, isActive: Boolean)
+    @Query("UPDATE tasks SET status = :status WHERE id = :taskId")
+    suspend fun changeTaskActiveStatus(taskId: Int, status: TaskStatus)
 
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM tasks WHERE isActive = 1 ORDER BY createdAt DESC")
-    fun getAllTasksExceptNotActive(): Flow<List<TaskEntity>>
+    @Query("SELECT * FROM tasks WHERE status != :status ORDER BY createdAt DESC")
+    fun getAllTasksExceptNotActive(status: TaskStatus = TaskStatus.DELETED): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     suspend fun getTaskById(taskId: Int): TaskEntity
 
-    @Query("SELECT * FROM tasks WHERE status = 'IN_PROGRESS'")
-    suspend fun getInProgressTask(): List<TaskEntity>
+    @Query("SELECT * FROM tasks WHERE status = :status")
+    suspend fun getInProgressTask(status: TaskStatus = TaskStatus.IN_PROGRESS): List<TaskEntity>
 
-    @Query("SELECT * FROM tasks WHERE status = 'IN_PROGRESS'")
-    fun getInProgressTaskFlow(): Flow<TaskEntity?>
+    @Query("SELECT * FROM tasks WHERE status = :status LIMIT 1")
+    fun getInProgressTaskFlow(status: TaskStatus = TaskStatus.IN_PROGRESS): Flow<TaskEntity?>
 }
