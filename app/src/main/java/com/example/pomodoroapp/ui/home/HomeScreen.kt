@@ -35,7 +35,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pomodoroapp.R
-import com.example.pomodoroapp.ui.theme.onTextHint
+import com.example.pomodoroapp.ui.theme.breakText
+import com.example.pomodoroapp.ui.theme.focusText
 
 @Composable
 fun HomeScreen(
@@ -54,6 +55,7 @@ fun HomeScreen(
     }
 
     HomeContent(
+        modifier = modifier,
         homeUiState = homeUiState,
         timeDisplay = timeDisplay,
         onNavigateToTaskList = onNavigateToTaskList
@@ -67,7 +69,6 @@ fun HomeContent(
     timeDisplay: String,
     onNavigateToTaskList: () -> Unit = {} // 添加導航函數參數
 ) {
-    val hasTask = homeUiState.taskDescribe.isNotBlank()
     // UI實作
     Column(modifier.fillMaxSize()) {
         //元件1：Column擺放格式化後的Timer和任務描述
@@ -78,9 +79,9 @@ fun HomeContent(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (hasTask) {
+            if (homeUiState.hasTask()) {
                 //加入圖片
-                val iconResId = if (homeUiState.currentPhase == TimerPhase.FOCUS)
+                val iconResId = if (homeUiState.isFocus())
                     R.drawable.icon_focus
                 else
                     R.drawable.icon_break
@@ -96,16 +97,17 @@ fun HomeContent(
                 Text(
                     text = timeDisplay,
                     style = MaterialTheme.typography.displayLarge,
-                    color = if (hasTask) Color.Unspecified else MaterialTheme.colorScheme.onTextHint
+                    color = if (homeUiState.isFocus()) MaterialTheme.colorScheme.focusText else MaterialTheme.colorScheme.breakText
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (homeUiState.currentPhase == TimerPhase.FOCUS){
+                if (homeUiState.isFocus()){
                     Text(
                         text = homeUiState.taskDescribe,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else {
@@ -165,7 +167,7 @@ fun HomeContent(
             //開始/暫停
             Button(
                 shape = MaterialTheme.shapes.medium,
-                enabled = hasTask,
+                enabled = homeUiState.hasTask(),
                 onClick = {
                     homeUiState.onClickEvent(HomeClickEvent.StartPauseClicked)
                 }
@@ -178,7 +180,7 @@ fun HomeContent(
 
             OutlinedButton(
                 shape = MaterialTheme.shapes.medium,
-                enabled = hasTask,
+                enabled = homeUiState.hasTask(),
                 onClick = {
                     homeUiState.onClickEvent(HomeClickEvent.ResetClicked)
                 }) {

@@ -15,4 +15,14 @@ import androidx.compose.ui.graphics.Color
 val ColorScheme.onTextHint: Color
     @Composable get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
 
+val ColorScheme.focusBackground: Color
+    @Composable get() = if (isSystemInDarkTheme()) FocusDarkBackground else FocusLightBackground
 
+val ColorScheme.focusText: Color
+    @Composable get() = if (isSystemInDarkTheme()) FocusDarkText else FocusLightText
+
+val ColorScheme.breakBackground: Color
+    @Composable get() = if (isSystemInDarkTheme()) BreakDarkBackground else BreakLightBackground
+
+val ColorScheme.breakText: Color
+    @Composable get() = if (isSystemInDarkTheme()) BreakDarkText else BreakLightText

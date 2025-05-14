@@ -4,6 +4,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,8 @@ import com.example.pomodoroapp.ui.components.TopBar
 import com.example.pomodoroapp.ui.history.HistoryScreen
 import com.example.pomodoroapp.ui.home.HomeScreen
 import com.example.pomodoroapp.ui.tasks.TaskListScreen
+import com.example.pomodoroapp.ui.theme.breakBackground
+import com.example.pomodoroapp.ui.theme.focusBackground
 
 const val TIMER = "Timer"
 const val TASKS = "Tasks"
@@ -37,9 +40,13 @@ fun MainScreen(modifier: Modifier) {
     val focusTitle = stringResource(R.string.title_bar_focus)
     val taskTitle = stringResource(R.string.title_bar_tasks)
     val historyTitle = stringResource(R.string.title_bar_history)
+    val focusBackground = MaterialTheme.colorScheme.focusBackground
+    val breakBackground =  MaterialTheme.colorScheme.breakBackground
+    val defaultBackground = MaterialTheme.colorScheme.background
 
     val navController = rememberNavController()
     var currentTitle by remember { mutableStateOf(focusTitle) }
+    var mainBackgroundColor by remember { mutableStateOf(defaultBackground) }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect {
@@ -53,7 +60,13 @@ fun MainScreen(modifier: Modifier) {
     }
     Scaffold(
         modifier = modifier,
-        topBar = { TopBar(title = currentTitle) },
+        containerColor = mainBackgroundColor,
+        topBar = {
+            TopBar(
+                mainColor = mainBackgroundColor,
+                title = currentTitle
+            )
+        },
         bottomBar = {
             BottomBar(navController = navController)
         }
@@ -82,13 +95,16 @@ fun MainScreen(modifier: Modifier) {
                     },
                     onFocusStateChanged = { isBreak ->
                         currentTitle = if (isBreak) breakTitle else focusTitle
+                        mainBackgroundColor = if (isBreak) breakBackground else focusBackground
                     }
                 )
             }
             composable(TASKS) {
+                mainBackgroundColor = defaultBackground
                 TaskListScreen()
             }
             composable(HISTORY) {
+                mainBackgroundColor = defaultBackground
                 HistoryScreen()
             }
         }

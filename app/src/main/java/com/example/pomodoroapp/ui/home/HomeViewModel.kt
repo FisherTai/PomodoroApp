@@ -32,7 +32,11 @@ data class HomeUiState(
     val taskDescribe: String,
     val currentPhase: TimerPhase,
     val onClickEvent: (event: HomeClickEvent) -> Unit
-)
+) {
+  fun hasTask() = taskDescribe.isNotBlank()
+  fun isFocus() = currentPhase == TimerPhase.FOCUS
+  fun isBreak() = currentPhase == TimerPhase.BREAK
+}
 
 /**
  * UI Event
