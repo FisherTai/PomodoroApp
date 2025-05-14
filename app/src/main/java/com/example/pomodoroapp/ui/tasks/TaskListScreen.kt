@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -33,7 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pomodoroapp.R
 import com.example.pomodoroapp.data.model.TaskUIData
-import com.example.pomodoroapp.ui.theme.onTextHint
+import com.example.pomodoroapp.ui.components.FullScreenHint
 
 
 @Composable
@@ -103,18 +102,9 @@ fun TaskListComponent(
         HorizontalDivider()
 
         if (tasks.isEmpty()){
-            //置中、Display、hint色的Text
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.hint_txt_no_task),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onTextHint,
-                    textAlign = TextAlign.Center,
-                    )
-            }
+            FullScreenHint(
+                message = stringResource(R.string.hint_txt_no_task)
+            )
         } else {
             LazyColumn {
                 items(tasks) { task ->

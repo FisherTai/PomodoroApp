@@ -16,12 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pomodoroapp.R
 import com.example.pomodoroapp.data.model.HistoryUIData
+import com.example.pomodoroapp.ui.components.FullScreenHint
 
 @Composable
 fun HistoryScreen(
@@ -38,14 +41,20 @@ fun HistoryContent(
     modifier: Modifier = Modifier,
     historyItems: List<Any>,
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(historyItems) {
-            if (it is String) {
-                HistoryHeader(modifier, it)
-            } else if (it is HistoryUIData) {
-                HistoryItem(title = it.title, timeCount = it.timeCount)
+    if (historyItems.isNotEmpty()) {
+        LazyColumn(modifier = modifier.fillMaxSize()) {
+            items(historyItems) {
+                if (it is String) {
+                    HistoryHeader(modifier, it)
+                } else if (it is HistoryUIData) {
+                    HistoryItem(title = it.title, timeCount = it.timeCount)
+                }
             }
         }
+    } else {
+        FullScreenHint(
+            message = stringResource(R.string.hint_txt_no_history)
+        )
     }
 }
 
