@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pomodoroapp.R
@@ -63,6 +66,11 @@ fun TaskListComponent(
     onClickEvent: (TaskScreenClickEvent) -> Unit = {},
     onInputValueChange: (String) -> Unit = {},
 ) {
+    //編輯敘述的彈窗
+    var showEditDialog by remember { mutableStateOf(false) }
+    var taskToEdit by remember { mutableStateOf<TaskUIData?>(null) }
+    var editedTaskText by remember { mutableStateOf("") }
+
     Column(modifier = modifier.fillMaxSize()) {
         OutlinedTextField(
             value = newTaskText,
@@ -120,13 +128,56 @@ fun TaskListComponent(
                             onClickEvent(TaskScreenClickEvent.DeleteTask(task))
                         },
                         onEditTask = {
-                            //TODO 還沒完成
-                            onClickEvent(TaskScreenClickEvent.EditTask(task))
+                            taskToEdit = task
+                            editedTaskText = task.description
+                            showEditDialog = true
                         }
                     )
                 }
             }
         }
+    }
+
+    // 編輯任務敘述的Dialog
+    if (showEditDialog && taskToEdit != null) {
+        AlertDialog(
+            onDismissRequest = { showEditDialog = false },
+            title = { Text(stringResource(R.string.edit_task_title)) },
+            text = {
+                //內容用輸入框
+                OutlinedTextField(
+                    value = editedTaskText,
+                    onValueChange = { editedTaskText = it },
+                    label = { Text(stringResource(R.string.hint_txt_edit_task)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium
+                )
+            },
+            //確定按鈕
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (editedTaskText.isNotBlank() && taskToEdit != null) {
+                            onClickEvent(
+                                TaskScreenClickEvent.EditTask(
+                                    taskToEdit!!.copy(description = editedTaskText)
+                                )
+                            )
+                            showEditDialog = false
+                            taskToEdit = null
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditDialog = false }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            },
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        )
     }
 }
 

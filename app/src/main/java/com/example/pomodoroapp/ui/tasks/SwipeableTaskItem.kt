@@ -10,6 +10,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.pomodoroapp.ui.theme.DeepGreen
+import com.example.pomodoroapp.ui.theme.DeepRed
 import com.kevinnzou.compose.swipebox.SwipeBox
 import com.kevinnzou.compose.swipebox.SwipeDirection
 import com.kevinnzou.compose.swipebox.widget.SwipeIcon
@@ -29,20 +31,20 @@ fun SwipeBoxAtEnd(
     SwipeBox(
         modifier = Modifier.fillMaxWidth(),
         swipeDirection = SwipeDirection.EndToStart,
-        endContentWidth = 60.dp,
+        endContentWidth = 120.dp,
         endContent = { swipeableState, endSwipeProgress ->
             //刪除按鈕
             SwipeIcon(
                 imageVector = Icons.Outlined.Delete,
                 contentDescription = "Delete",
                 tint = Color.White,
-                background = Color.Red,
+                background = DeepRed,
                 weight = 1f,
-                iconSize = 20.dp,
+                iconSize = 26.dp,
                 onClick = {
                     onDeleteTask()
                     coroutineScope.launch {
-                        swipeableState.animateTo(0)
+                        swipeableState.animateTo(0) //關閉
                     }
                 }
             )
@@ -51,7 +53,7 @@ fun SwipeBoxAtEnd(
                 imageVector = Icons.Outlined.Edit,
                 contentDescription = "Edit",
                 tint = Color.White,
-                background =  Color.Green,
+                background = DeepGreen,
                 weight = 1f,
                 iconSize = 20.dp,
                 onClick = {

@@ -11,4 +11,9 @@
     <string name="hint_txt_no_task">There are no tasks right now.\n You can add one using the section above!</string>
     <string name="timer_phase_focus">Focussing</string>
     <string name="timer_phase_break">Breaking</string>
+    <string name="hint_txt_no_history">Your records will appear here after you complete a task!</string>
+    <string name="edit_task_title">Edit Task</string>
+    <string name="hint_txt_edit_task">Edit task description</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
 </resources>

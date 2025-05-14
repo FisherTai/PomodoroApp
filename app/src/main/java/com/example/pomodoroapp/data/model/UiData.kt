@@ -4,7 +4,7 @@ import com.example.pomodoroapp.data.sources.database.HistoryWithTask
 import com.example.pomodoroapp.data.sources.database.TaskEntity
 import com.example.pomodoroapp.data.sources.database.TaskStatus
 
-class TaskUIData(val id: Int, val description: String, val isChoose: Boolean) {
+data class TaskUIData(val id: Int, val description: String, val isChoose: Boolean) {
     companion object {
         fun build(entity: TaskEntity): TaskUIData =
             TaskUIData(entity.id, entity.description, entity.status == TaskStatus.IN_PROGRESS)
