@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">PomodoroApp</string>
+    <string name="title_bar_timer">Timer</string>
+    <string name="title_bar_tasks">Task List Screen</string>
+    <string name="title_bar_history">History</string>
+    <string name="title_bar_focus">Focus</string>
+    <string name="title_bar_break">Break</string>
     <string name="hint_message_add_new1">Click</string>
     <string name="hint_message_add_new2">to add a task</string>
     <string name="hint_message_welcome">Welcome!</string>

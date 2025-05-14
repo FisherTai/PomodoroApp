@@ -12,12 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.pomodoroapp.R
 import com.example.pomodoroapp.ui.theme.PomodoroAppTheme
 import com.example.pomodoroapp.ui.components.BottomBar
 import com.example.pomodoroapp.ui.components.TopBar
@@ -31,14 +33,20 @@ const val HISTORY = "History"
 
 @Composable
 fun MainScreen(modifier: Modifier) {
+    val breakTitle = stringResource(R.string.title_bar_break)
+    val focusTitle = stringResource(R.string.title_bar_focus)
+    val taskTitle = stringResource(R.string.title_bar_tasks)
+    val historyTitle = stringResource(R.string.title_bar_history)
+
     val navController = rememberNavController()
-    var currentTitle by remember { mutableStateOf(TIMER) }
+    var currentTitle by remember { mutableStateOf(focusTitle) }
+
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect {
             currentTitle = when (it.destination.route) {
-                TIMER -> TIMER
-                TASKS -> "Task List Screen"
-                HISTORY -> HISTORY
+                TIMER -> focusTitle
+                TASKS -> taskTitle
+                HISTORY -> historyTitle
                 else -> it.destination.route ?: ""
             }
         }
@@ -71,6 +79,9 @@ fun MainScreen(modifier: Modifier) {
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    onFocusStateChanged = { isBreak ->
+                        currentTitle = if (isBreak) breakTitle else focusTitle
                     }
                 )
             }
