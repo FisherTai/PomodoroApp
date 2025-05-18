@@ -73,6 +73,11 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.timber)
     implementation(libs.compose.swipebox)
+
+    // 測試相關依賴
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
 }
 
 ksp {
