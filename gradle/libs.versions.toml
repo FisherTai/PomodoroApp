@@ -1,20 +1,20 @@
 [versions]
 agp = "8.10.0-alpha08"
 composeSwipebox = "1.2.0"
-hiltNavigationFragment = "1.2.0"
+hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.8.0"
-composeBom = "2024.09.00"
+lifecycleRuntimeKtx = "2.9.0"
+activityCompose = "1.10.1"
+composeBom = "2025.05.00"
 materialIconsExtended = "<compose_version>"
-roomCommonJvm = "2.7.0"
-roomKtx = "2.7.0"
-roomRuntimeAndroid = "2.7.0"
-navigationCompose = "2.8.9"
+roomCommonJvm = "2.7.1"
+roomKtx = "2.7.1"
+roomRuntimeAndroid = "2.7.1"
+navigationCompose = "2.9.0"
 ksp       = "2.0.21-1.0.28"
 hilt      = "2.56.1"
 timber = "5.0.1"
@@ -22,8 +22,7 @@ composeFoundation = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationFragment" }
-androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltNavigationFragment" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler",        version.ref = "roomRuntimeAndroid" }
