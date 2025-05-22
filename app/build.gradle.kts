@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pomodoroapp"
+    namespace = "com.fisher.pomodoroapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.pomodoroapp"
+        applicationId = "com.fisher.pomodoroapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
