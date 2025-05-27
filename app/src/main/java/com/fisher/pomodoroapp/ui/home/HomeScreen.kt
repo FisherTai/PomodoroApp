@@ -1,5 +1,6 @@
 package com.fisher.pomodoroapp.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fisher.pomodoroapp.R
+import com.fisher.pomodoroapp.service.TimerService
 import com.fisher.pomodoroapp.ui.theme.breakText
 import com.fisher.pomodoroapp.ui.theme.focusText
 
@@ -44,6 +48,23 @@ fun HomeScreen(
     onNavigateToTaskList: () -> Unit = {}, // 添加導航函數參數
     onFocusStateChanged: (Boolean) -> Unit = {}, //專注狀態切換
 ) {
+
+    val ctx = LocalContext.current
+    val viewModel: HomeViewModel = hiltViewModel()
+    val commands = viewModel.commands.collectAsState(initial = null)
+
+    // 每次有 command 就轉成 Intent
+    commands.value?.let { cmd ->
+        val action = when (cmd) {
+            TimerCommand.START -> TimerService.ACTION_START
+            TimerCommand.PAUSE -> TimerService.ACTION_PAUSE
+            TimerCommand.RESET -> TimerService.ACTION_RESET
+            TimerCommand.SKIP  -> TimerService.ACTION_SKIP
+        }
+        ctx.startService(Intent(ctx, TimerService::class.java).apply { this.action = action })
+    }
+
+
     val timeDisplay by homeViewModel.timeDisplay.collectAsStateWithLifecycle()
     val homeUiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
     val currentPhase by homeViewModel.currentPhase.collectAsStateWithLifecycle()

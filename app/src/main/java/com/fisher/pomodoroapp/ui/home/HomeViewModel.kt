@@ -5,45 +5,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fisher.pomodoroapp.data.repository.HistoryRepository
 import com.fisher.pomodoroapp.data.repository.TaskRepository
-import com.fisher.pomodoroapp.data.sources.database.HistoryEntity
-import com.fisher.pomodoroapp.util.TimerUtils
+import com.fisher.pomodoroapp.data.repository.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 
 
 
-/**
- * UI Event
- */
-sealed class HomeClickEvent {
-    data object StartPauseClicked : HomeClickEvent()
-    data object ResetClicked : HomeClickEvent()
-    data object SkipPhaseClicked : HomeClickEvent()
-}
+enum class TimerCommand { START, PAUSE, RESET, SKIP }
 
-/**
- * 當前的階段
- */
-enum class TimerPhase {
-    FOCUS,
-    BREAK,
-    BIG_BREAK
-}
 
 /**
  * 計時的狀態
@@ -57,18 +36,19 @@ enum class CountDownState {
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
-    private val historyRepository: HistoryRepository
-) : ViewModel() {
-
+    private val historyRepository: HistoryRepository,
+    private val timerRepository: TimerRepository,
+    ) : ViewModel() {
+/*
     // 用Duration替代timestamp表示
-    private val defaultFocusTimeDuration = 25.minutes // 預設專注時間
-    private val defaultBreakTimeDuration = 5.minutes //預設休息時間
-    private val defaultBigBreakTimeDuration = 20.minutes //預設大休息時間
+//    private val defaultFocusTimeDuration = 25.minutes // 預設專注時間
+//    private val defaultBreakTimeDuration = 5.minutes //預設休息時間
+//    private val defaultBigBreakTimeDuration = 20.minutes //預設大休息時間
 
     //快速測試用
-//    private val defaultFocusTimeDuration = 0.2.minutes // 預設專注時間
-//    private val defaultBreakTimeDuration = 0.2.minutes //預設休息時間
-//    private val defaultBigBreakTimeDuration = 0.3.minutes //預設大休息時間
+    private val defaultFocusTimeDuration = 5.0.seconds // 預設專注時間
+    private val defaultBreakTimeDuration = 5.0.seconds //預設休息時間
+    private val defaultBigBreakTimeDuration = 10.0.seconds //預設大休息時間
 
     private var countdownJob: Job? = null
     private var cycleCount = 0 //循環的次數
@@ -207,5 +187,67 @@ class HomeViewModel @Inject constructor(
                 )
             )
         }
+    }
+*/
+
+//    //=======================Service========================
+
+    private val currentProgressTask = taskRepository
+        .getInProgressTaskFlow()
+        .distinctUntilChanged() // 去重
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(2000), //當有訂閱者時才啟動，在沒有訂閱者後閒置2秒才停止
+            initialValue = null
+        )
+
+    // --- 公開資料 ---
+    val timeDisplay: StateFlow<String> = timerRepository.state.map {
+        DateUtils.formatElapsedTime(it.millisLeft / 1000)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "00:00")
+
+    val currentPhase = timerRepository.state.map { it.phase }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), timerRepository.state.value.phase
+    )
+
+    val isRunning = timerRepository.state.map { it.isRunning }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), timerRepository.state.value.isRunning
+    )
+
+    // CommandFlow: 由 UI 收集並根據命令決定要啟動哪個 Service action
+    private val _commands = MutableSharedFlow<TimerCommand>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val commands = _commands.asSharedFlow()
+
+    // 封裝一層給 UI 的 HomeUiState
+    val homeUiState: StateFlow<HomeUiState> = combine(
+        isRunning,
+        currentPhase,
+        currentProgressTask,
+    ) { running, phase, currentProgress ->
+        HomeUiState(
+            countDownState = if (running) CountDownState.RUNNING else CountDownState.STOP,
+            taskDescribe = currentProgress?.description ?: "", // TODO 依照 TaskRepo
+            currentPhase = phase,
+            onClickEvent = ::handleClick,
+        )
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(
+        countDownState = CountDownState.STOP,
+        taskDescribe = "",
+        currentPhase = TimerPhase.FOCUS,
+        onClickEvent = ::handleClick,
+    ))
+
+    private fun handleClick(event: HomeClickEvent) {
+        val cmd = when (event) {
+            HomeClickEvent.StartPauseClicked -> if (isRunning.value) TimerCommand.PAUSE else TimerCommand.START
+            HomeClickEvent.ResetClicked -> TimerCommand.RESET
+            HomeClickEvent.SkipPhaseClicked -> TimerCommand.SKIP
+        }
+        _commands.tryEmit(cmd)
     }
 }
