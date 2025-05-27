@@ -2,7 +2,6 @@ package com.fisher.pomodoroapp.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fisher.pomodoroapp.data.model.HistoryUIData
 import com.fisher.pomodoroapp.data.repository.HistoryRepository
 import com.fisher.pomodoroapp.util.DateUtils
 import com.fisher.pomodoroapp.util.toDateString

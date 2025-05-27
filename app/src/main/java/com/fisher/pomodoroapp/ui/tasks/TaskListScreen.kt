@@ -30,7 +30,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fisher.pomodoroapp.R
-import com.fisher.pomodoroapp.data.model.TaskUIData
 import com.fisher.pomodoroapp.ui.components.FullScreenHint
 
 

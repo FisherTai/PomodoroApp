@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fisher.pomodoroapp.R
-import com.fisher.pomodoroapp.data.model.HistoryUIData
 import com.fisher.pomodoroapp.ui.components.FullScreenHint
 
 @Composable

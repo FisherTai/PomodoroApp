@@ -2,7 +2,6 @@ package com.fisher.pomodoroapp.ui.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fisher.pomodoroapp.data.model.TaskUIData
 import com.fisher.pomodoroapp.data.repository.TaskRepository
 import com.fisher.pomodoroapp.data.sources.database.TaskEntity
 import com.fisher.pomodoroapp.data.sources.database.TaskStatus
