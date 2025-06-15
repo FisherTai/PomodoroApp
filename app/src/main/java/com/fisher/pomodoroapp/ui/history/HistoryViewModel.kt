@@ -3,6 +3,7 @@ package com.fisher.pomodoroapp.ui.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fisher.pomodoroapp.data.repository.HistoryRepository
+import com.fisher.pomodoroapp.domain.CombineHistoriesUseCase
 import com.fisher.pomodoroapp.util.DateUtils
 import com.fisher.pomodoroapp.util.toDateString
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel@Inject constructor(
-    historyRepository: HistoryRepository
+    historyRepository: HistoryRepository,
+    private val combineUseCase: CombineHistoriesUseCase,
 ) : ViewModel() {
 
     private val dateUtils = DateUtils()
@@ -48,15 +50,6 @@ class HistoryViewModel@Inject constructor(
      * 將相同taskId的HistoryUIData合併，也就是timeCount相加
      */
     private fun combineHistoryUIData(list: List<HistoryUIData>): List<HistoryUIData> {
-        val group = list.groupBy { it.taskId }
-        return group.map { (taskId, histories) ->
-            // 取第一筆資料的title,因為相同taskId的title應該要一樣
-            val firstHistory = histories.first()
-            HistoryUIData(
-                taskId = taskId,
-                title = firstHistory.title,
-                timeCount = histories.sumOf { it.timeCount }
-            )
-        }
+        return combineUseCase.invoke(list)
     }
 }
